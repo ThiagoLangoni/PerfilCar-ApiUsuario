@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping(path = "/usuario")
+@CrossOrigin(origins = "*")
 @Api(value = "API REST Usuarios")
 public class UsuarioResource {
 
@@ -35,7 +37,7 @@ public class UsuarioResource {
 	}
 
 	@GetMapping("/usuarios")
-	@ApiOperation(value="Retorna uma lista de usuarios")
+	@ApiOperation(value = "Retorna uma lista de usuarios")
 	public List<Usuario> listaUsuarios() {
 		String value = "Pedido de Lista de Usuario" + "-" + ZonedDateTime.now().toString();
 		this.producerkafka.sendMessage(value);
@@ -44,7 +46,7 @@ public class UsuarioResource {
 	}
 
 	@GetMapping("/usuarios/{emailUsuario}")
-	@ApiOperation(value="Retorna um usuario por email")
+	@ApiOperation(value = "Retorna um usuario por email")
 	public List<Usuario> listaUsuariosPorEmail(@PathVariable(value = "emailUsuario") String emailUsuario) {
 		String value = "Pedido de Lista de Usuario por e-mail" + "-" + emailUsuario + "-"
 				+ ZonedDateTime.now().toString();
@@ -54,7 +56,7 @@ public class UsuarioResource {
 	}
 
 	@GetMapping("/usuario/{idUsuario}")
-	@ApiOperation(value="Retorna um usuario por id")
+	@ApiOperation(value = "Retorna um usuario por id")
 	public Usuario listausuarioUnico(@PathVariable(value = "idUsuario") long idUsuario) {
 		String value = "Pedido de Lista de Usuario por ID" + "-" + idUsuario + "-" + ZonedDateTime.now().toString();
 
@@ -63,18 +65,29 @@ public class UsuarioResource {
 		return usuarioRepository.findById(idUsuario);
 	}
 
+	@GetMapping("/usuario/{nomeUsuario}/{senhaUsuario}")
+	@ApiOperation(value = "Retorna um usuario por nome e senha")
+	public Usuario listausuarioUnico(@PathVariable(value = "nomeUsuario") String nomeUsuario,
+			@PathVariable(value = "senhaUsuario") String senhaUsuario) {
+		String value = "Pedido Usuario por nomeUsuario" + "-" + nomeUsuario + "-" + ZonedDateTime.now().toString();
+
+		// this.producerkafka.sendMessage(value);
+
+		return usuarioRepository.findByNomeUsuarioAndSenhaUsuario(nomeUsuario, senhaUsuario);
+	}
+
 	@PostMapping("/usuario")
-	@ApiOperation(value="Cria um novo usuario")
+	@ApiOperation(value = "Cria um novo usuario")
 	public Usuario salvaUsuario(@RequestBody Usuario usuario) {
 		String value = "Pedido de criacao de Usuario" + "-" + ZonedDateTime.now().toString();
 
-		this.producerkafka.sendMessage(value);
+		// this.producerkafka.sendMessage(value);
 
 		return usuarioRepository.save(usuario);
 	}
 
 	@PutMapping("/usuario")
-	@ApiOperation(value="Atualiza um novo usuario")
+	@ApiOperation(value = "Atualiza um novo usuario")
 	public Usuario atualizaUsuario(@RequestBody Usuario usuario) {
 		String value = "Pedido de atualizacao de Usuario" + "-" + ZonedDateTime.now().toString();
 
@@ -84,7 +97,7 @@ public class UsuarioResource {
 	}
 
 	@DeleteMapping("/usuario")
-	@ApiOperation(value="Exclui um novo usuario")
+	@ApiOperation(value = "Exclui um novo usuario")
 	public void deletaUsuario(@RequestBody Usuario usuario) {
 		String value = "Pedido de delecao de usuario" + "-" + ZonedDateTime.now().toString();
 
